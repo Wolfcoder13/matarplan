@@ -54,6 +54,35 @@ export async function createMeal(formData: FormData) {
   redirect("/meals");
 }
 
+export async function createMealAndReturn(
+  name: string,
+  ingredientNames: string[]
+): Promise<{ id: string; name: string }> {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const trimmedName = name.trim();
+  if (!trimmedName) throw new Error("Meal name is required");
+
+  const validIngredients = ingredientNames.filter((n) => n.trim());
+
+  const [meal] = await db
+    .insert(meals)
+    .values({ name: trimmedName, createdBy: session.user.id })
+    .returning({ id: meals.id });
+
+  for (const ingredientName of validIngredients) {
+    const ingredientId = await getOrCreateIngredient(ingredientName);
+    await db
+      .insert(mealIngredients)
+      .values({ mealId: meal.id, ingredientId })
+      .onConflictDoNothing();
+  }
+
+  revalidatePath("/meals");
+  return { id: meal.id, name: trimmedName };
+}
+
 export async function updateMeal(mealId: string, formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
