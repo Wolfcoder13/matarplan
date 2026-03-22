@@ -174,10 +174,10 @@ export function SlotEditor({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40"
+      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/40"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-t-xl sm:rounded-xl p-4 space-y-4 max-h-[85vh] overflow-y-auto">
+      <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-t-xl sm:rounded-xl p-4 pb-20 sm:pb-4 space-y-4 max-h-[85vh] overflow-y-auto">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">
             {dayOfWeek} — {slotType}
