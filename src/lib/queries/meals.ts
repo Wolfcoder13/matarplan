@@ -53,7 +53,13 @@ export async function getMealById(id: string) {
 }
 
 export async function searchMeals(query: string) {
-  if (!query.trim()) return [];
+  if (!query.trim()) {
+    return db
+      .select({ id: meals.id, name: meals.name })
+      .from(meals)
+      .orderBy(meals.name)
+      .limit(50);
+  }
 
   return db
     .select({ id: meals.id, name: meals.name })

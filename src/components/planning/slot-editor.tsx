@@ -33,11 +33,27 @@ export function SlotEditor({
     isSkipped ? "skip" : "search"
   );
   const [query, setQuery] = useState("");
+  const [allMeals, setAllMeals] = useState<MealSuggestion[]>([]);
   const [suggestions, setSuggestions] = useState<MealSuggestion[]>([]);
   const [skipNote, setSkipNote] = useState(currentSkipNote || "");
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
+  // Load all meals on mount
+  useEffect(() => {
+    async function loadMeals() {
+      try {
+        const res = await fetch("/api/meals/search?q=");
+        const data = await res.json();
+        setAllMeals(data.results || []);
+      } catch {
+        setAllMeals([]);
+      }
+    }
+    loadMeals();
+  }, []);
+
+  // Filter meals based on query
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
@@ -62,6 +78,8 @@ export function SlotEditor({
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [query]);
+
+  const displayedMeals = query.trim() ? suggestions : allMeals;
 
   async function handleAssign(mealId: string) {
     setLoading(true);
@@ -94,15 +112,18 @@ export function SlotEditor({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40">
-      <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-t-xl sm:rounded-xl p-4 space-y-4 max-h-[80vh] overflow-y-auto">
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-t-xl sm:rounded-xl p-4 space-y-4 max-h-[85vh] overflow-y-auto">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">
             {dayOfWeek} — {slotType}
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg"
+            className="text-gray-400 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none p-1"
           >
             &times;
           </button>
@@ -142,15 +163,15 @@ export function SlotEditor({
               autoFocus
               className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {suggestions.length > 0 && (
-              <ul className="mt-2 max-h-48 overflow-y-auto space-y-1">
-                {suggestions.map((meal) => (
+            {displayedMeals.length > 0 && (
+              <ul className="mt-2 max-h-60 overflow-y-auto space-y-1">
+                {displayedMeals.map((meal) => (
                   <li key={meal.id}>
                     <button
                       type="button"
                       onClick={() => handleAssign(meal.id)}
                       disabled={loading}
-                      className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 disabled:opacity-50"
+                      className="w-full text-left px-3 py-3 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-200 disabled:opacity-50"
                     >
                       {meal.name}
                     </button>
@@ -159,7 +180,14 @@ export function SlotEditor({
               </ul>
             )}
             {query.length > 0 && suggestions.length === 0 && (
-              <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">No meals found.</p>
+              <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">
+                No meals found.
+              </p>
+            )}
+            {!query && allMeals.length === 0 && (
+              <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">
+                No meals created yet. Create one from the Meals page.
+              </p>
             )}
           </div>
         )}
