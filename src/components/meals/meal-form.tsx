@@ -8,6 +8,7 @@ interface MealFormProps {
   meal?: {
     id: string;
     name: string;
+    recipe: string | null;
     ingredients: { id: string; name: string }[];
   };
 }
@@ -114,6 +115,23 @@ export function MealForm({ meal }: MealFormProps) {
             />
           ))}
         </div>
+      </div>
+
+      <div>
+        <label
+          htmlFor="recipe"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
+        >
+          Recipe (optional)
+        </label>
+        <textarea
+          id="recipe"
+          name="recipe"
+          rows={4}
+          defaultValue={meal?.recipe || ""}
+          placeholder="Add recipe instructions..."
+          className="w-full rounded-lg border border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
+        />
       </div>
 
       <button

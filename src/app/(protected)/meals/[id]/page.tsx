@@ -68,6 +68,17 @@ export default async function MealDetailPage({
           </ul>
         )}
       </div>
+
+      <div className="mt-6">
+        <h2 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Recipe</h2>
+        {meal.recipe ? (
+          <p className="text-sm text-gray-600 dark:text-gray-200 whitespace-pre-wrap bg-gray-50 dark:bg-gray-800 rounded p-3">
+            {meal.recipe}
+          </p>
+        ) : (
+          <p className="text-sm text-gray-400 dark:text-gray-500">No recipe added.</p>
+        )}
+      </div>
     </div>
   );
 }

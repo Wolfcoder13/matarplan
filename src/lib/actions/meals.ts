@@ -34,12 +34,13 @@ export async function createMeal(formData: FormData) {
   const name = (formData.get("name") as string)?.trim();
   if (!name) throw new Error("Meal name is required");
 
+  const recipe = (formData.get("recipe") as string)?.trim() || null;
   const ingredientNames = formData.getAll("ingredients") as string[];
   const validIngredients = ingredientNames.filter((n) => n.trim());
 
   const [meal] = await db
     .insert(meals)
-    .values({ name, createdBy: session.user.id })
+    .values({ name, recipe, createdBy: session.user.id })
     .returning({ id: meals.id });
 
   for (const ingredientName of validIngredients) {
@@ -56,7 +57,8 @@ export async function createMeal(formData: FormData) {
 
 export async function createMealAndReturn(
   name: string,
-  ingredientNames: string[]
+  ingredientNames: string[],
+  recipe?: string
 ): Promise<{ id: string; name: string }> {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
@@ -64,11 +66,12 @@ export async function createMealAndReturn(
   const trimmedName = name.trim();
   if (!trimmedName) throw new Error("Meal name is required");
 
+  const trimmedRecipe = recipe?.trim() || null;
   const validIngredients = ingredientNames.filter((n) => n.trim());
 
   const [meal] = await db
     .insert(meals)
-    .values({ name: trimmedName, createdBy: session.user.id })
+    .values({ name: trimmedName, recipe: trimmedRecipe, createdBy: session.user.id })
     .returning({ id: meals.id });
 
   for (const ingredientName of validIngredients) {
@@ -90,12 +93,13 @@ export async function updateMeal(mealId: string, formData: FormData) {
   const name = (formData.get("name") as string)?.trim();
   if (!name) throw new Error("Meal name is required");
 
+  const recipe = (formData.get("recipe") as string)?.trim() || null;
   const ingredientNames = formData.getAll("ingredients") as string[];
   const validIngredients = ingredientNames.filter((n) => n.trim());
 
   await db
     .update(meals)
-    .set({ name, updatedAt: new Date() })
+    .set({ name, recipe, updatedAt: new Date() })
     .where(eq(meals.id, mealId));
 
   // Remove existing ingredients and re-add

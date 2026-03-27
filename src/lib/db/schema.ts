@@ -37,6 +37,7 @@ export const users = pgTable("users", {
 export const meals = pgTable("meals", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
+  recipe: text("recipe"),
   createdBy: uuid("created_by")
     .references(() => users.id)
     .notNull(),

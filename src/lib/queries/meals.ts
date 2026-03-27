@@ -7,6 +7,7 @@ export async function getAllMeals() {
     .select({
       id: meals.id,
       name: meals.name,
+      recipe: meals.recipe,
       createdBy: users.name,
       createdAt: meals.createdAt,
     })
@@ -34,6 +35,7 @@ export async function getMealById(id: string) {
     .select({
       id: meals.id,
       name: meals.name,
+      recipe: meals.recipe,
       createdBy: users.name,
       createdAt: meals.createdAt,
     })

@@ -43,6 +43,7 @@ export function SlotEditor({
 
   // New meal form state
   const [newMealName, setNewMealName] = useState("");
+  const [newMealRecipe, setNewMealRecipe] = useState("");
   const [ingredientValues, setIngredientValues] = useState<string[]>([""]);
   const ingredientRefs = useRef<React.RefObject<HTMLInputElement | null>[]>([]);
 
@@ -131,7 +132,7 @@ export function SlotEditor({
     if (!newMealName.trim()) return;
     setLoading(true);
     const validIngredients = ingredientValues.filter((v) => v.trim());
-    const meal = await createMealAndReturn(newMealName, validIngredients);
+    const meal = await createMealAndReturn(newMealName, validIngredients, newMealRecipe || undefined);
     await assignMealToSlot({
       calendarType,
       weekStartDate,
@@ -295,6 +296,18 @@ export function SlotEditor({
                   />
                 ))}
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                Recipe (optional)
+              </label>
+              <textarea
+                value={newMealRecipe}
+                onChange={(e) => setNewMealRecipe(e.target.value)}
+                placeholder="Add recipe instructions..."
+                rows={3}
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
+              />
             </div>
             <button
               onClick={handleCreateAndAssign}
